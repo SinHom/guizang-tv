@@ -19,7 +19,18 @@ public final class BootStart {
     }
     static boolean enabled(Context c) { return prefs(c).getBoolean("enabled", false); }
     private static int bootCount(Context c) {
-        return Settings.Global.getInt(c.getContentResolver(), Settings.Global.BOOT_COUNT, -1);
+        int boot = Settings.Global.getInt(c.getContentResolver(), Settings.Global.BOOT_COUNT, -1);
+        if (boot >= 0) return boot;
+        // Android 6 has no boot_count setting. Use a token that is stable for this boot
+        // (elapsedRealtime resets on every boot) so a repeated call is still skipped.
+        long elapsed = SystemClock.elapsedRealtime();
+        SharedPreferences p = prefs(c);
+        long started = p.getLong("boot-started", -1);
+        if (started < 0 || elapsed < started) {
+            started = elapsed;
+            p.edit().putLong("boot-started", started).apply();
+        }
+        return (int)(started / 1000);
     }
     static void enter(Activity a) {
         int boot = bootCount(a);

@@ -152,7 +152,7 @@ final class HomeSettings {
         }
         if(content!=null)stage.removeView(content);content=panel;stage.addView(panel,new FrameLayout.LayoutParams(-1,-1));
         refreshPreview();background(a.wallpaperDrawable());rendering=false;weatherChanged();
-        if(!choices.isEmpty())choices.get(Math.min(remembered.getOrDefault(page,0),choices.size()-1)).requestFocus();
+        if(!choices.isEmpty())choices.get(Math.min(remembered.containsKey(page)?remembered.get(page):0,choices.size()-1)).requestFocus();
     }
     private void searchCities(){
         if(searching)return;cityQuery=cityInput.getText().toString().trim();
